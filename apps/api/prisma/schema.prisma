@@ -1,0 +1,68 @@
+// apps/api/prisma/schema.prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") 
+ shadowDatabaseUrl = "postgresql://postgres:sabit@localhost:5432/bcs_questions_shadow"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Exam {
+  id        String    @id @default(cuid())
+  exam_name String
+  subjects  Subject[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  date           DateTime?
+  totalExaminees Int?
+  highestMark    Float?
+
+  @@map("exams")
+}
+
+model Subject {
+  id        String     @id @default(cuid())
+  name      String
+  exam      Exam       @relation(fields: [examId], references: [id], onDelete: Cascade)
+  examId    String
+  questions Question[]
+
+  @@map("subjects")
+  @@unique([name, examId])
+}
+
+model Question {
+  id              String   @id @default(cuid())
+  ques_no         Int
+  ques            String   @db.Text
+  option_1        String
+  option_2        String
+  option_3        String
+  option_4        String
+  correctAnswer   String   // Stores the correct option text, e.g., "Option 1"
+  explanation     String   @db.Text
+  add_favourite   Boolean  @default(false)
+  
+  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  subjectId String
+
+  @@map("questions")
+}
+
+model User {
+  id        String  @id @default(cuid())
+  name      String
+  email     String  @unique
+  phone     String? @unique
+  password  String
+  userId    String  @unique @default(cuid()) // This is the "Wym1" field
+  
+  // Extra fields
+  role      String  @default("user") // 'user' or 'admin'
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
