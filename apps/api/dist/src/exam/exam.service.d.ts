@@ -11,6 +11,8 @@ export declare class ExamService {
         subjects: ({
             questions: {
                 id: string;
+                createdAt: Date;
+                updatedAt: Date;
                 ques_no: number;
                 ques: string;
                 option_1: string;
@@ -52,6 +54,8 @@ export declare class ExamService {
     }>;
     getQuestionsForSubject(subjectId: string): Promise<{
         id: string;
+        createdAt: Date;
+        updatedAt: Date;
         ques_no: number;
         ques: string;
         option_1: string;

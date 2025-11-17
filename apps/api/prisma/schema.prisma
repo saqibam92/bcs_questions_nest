@@ -51,6 +51,9 @@ model Question {
   subject       Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   subjectId     String
 
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
   @@map("questions")
 }
 

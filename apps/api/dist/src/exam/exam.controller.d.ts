@@ -33,6 +33,8 @@ export declare class ExamController {
         count: number;
         data: {
             id: string;
+            createdAt: Date;
+            updatedAt: Date;
             ques_no: number;
             ques: string;
             option_1: string;

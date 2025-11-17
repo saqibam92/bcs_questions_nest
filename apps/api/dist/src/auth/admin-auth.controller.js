@@ -22,7 +22,7 @@ let AdminAuthController = class AdminAuthController {
     async login(loginDto) {
         const admin = await this.adminAuthService.validateAdmin(loginDto.email, loginDto.password);
         if (!admin) {
-            throw new UnauthorizedException('Invalid credentials');
+            throw new common_1.UnauthorizedException('Invalid credentials');
         }
         return this.adminAuthService.login(admin);
     }

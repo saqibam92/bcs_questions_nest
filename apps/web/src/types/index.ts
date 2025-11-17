@@ -1,6 +1,6 @@
-// src/types/index.ts
+// apps/web/src/types/index.ts
 
-// Based on your new Prisma Schema
+// 1. Content Interfaces
 export interface Question {
   id: string;
   ques_no: number;
@@ -13,7 +13,8 @@ export interface Question {
   explanation: string;
   add_favourite: boolean;
   subjectId: string;
-  
+  subject?: Subject;
+
   // These will be added in the service/component for convenience
   options?: string[];
   correctAnswerIndex?: number;
@@ -23,36 +24,50 @@ export interface Subject {
   id: string;
   name: string;
   examId: string;
-  questions: Question[]; // This might be included or fetched separately
+  exam?: Exam;
+  questions?: Question[]; 
 }
 
 export interface Exam {
   id: string;
   exam_name: string;
-  createdAt: string;
-  subjects: Subject[];
-  highestMark: number;
+  date: string; // ISO Date string
   totalExaminees?: number;
-  date: string
+  highestMark?: number;
+  subjects: Subject[];
+  createdAt: string;
 }
 
-// For API responses
+// 2. Auth & User Interfaces
+
+// For the End-User (Mobile/Web App User)
+export interface User {
+  id: string;
+  userId: string; // The custom ID (e.g., "Wym1")
+  name: string;
+  email: string;
+  phone?: string;
+  userType: 'FREE' | 'PAID' | 'PREMIUM'; // Updated to match your new schema requirements
+  createdAt: string;
+}
+
+// For the Admin Panel User (Staff)
+export interface Admin {
+  id: string;
+  name: string;
+  email: string;
+  role: 'SUPER_ADMIN' | 'ADMIN' | 'MODERATOR';
+  createdAt: string;
+}
+
+// 3. API & Result Interfaces
+
 export interface ApiResponse<T> {
   success: boolean;
   count?: number;
   data: T;
+  message?: string;
 }
-
-export interface User {
-  id: string;
-  userId: string;
-  name: string;
-  email: string;
-  phone?: string;
-  role: string;
-  createdAt: string;
-}
-
 
 export interface SubjectResult {
   subjectName: string;
@@ -67,4 +82,14 @@ export interface ExamResult {
   totalWrong: number;
   subjectBreakdown: SubjectResult[];
   rank?: number;
+}
+
+export interface ExamCreateDto {
+  exam_name?: string;
+  date: string | null;
+}
+
+export interface ExamUpdateDto {
+  exam_name?: string;
+  date?: string | null;
 }

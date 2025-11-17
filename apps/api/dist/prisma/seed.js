@@ -1,46 +1,33 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
-const fs = require("fs");
-const path = require("path");
+const bcrypt = require("bcrypt");
 const prisma = new client_1.PrismaClient();
+async function hashPassword(password) {
+    const saltRounds = 10;
+    return bcrypt.hash(password, saltRounds);
+}
 async function main() {
     console.log(`Start seeding ...`);
-    const dataPath = path.join(__dirname, 'data.json');
-    const rawData = fs.readFileSync(dataPath, 'utf-8');
-    const examData = JSON.parse(rawData);
-    await prisma.question.deleteMany();
-    await prisma.subject.deleteMany();
-    await prisma.exam.deleteMany();
-    console.log('Cleared existing data.');
-    for (const exam of examData) {
-        const createdExam = await prisma.exam.create({
+    const adminEmail = 'superadmin@example.com';
+    const adminPassword = 'password123';
+    const existingAdmin = await prisma.admin.findUnique({
+        where: { email: adminEmail },
+    });
+    if (existingAdmin) {
+        console.log('Super admin already exists. Skipping...');
+    }
+    else {
+        const hashedPassword = await hashPassword(adminPassword);
+        const admin = await prisma.admin.create({
             data: {
-                exam_name: exam.exam_name,
-                date: exam.date ? new Date(exam.date) : null,
-                totalExaminees: exam.totalExaminees,
-                highestMark: exam.highestMark,
-                subjects: {
-                    create: exam.subjectWiseSort.map((subject) => ({
-                        name: subject.subject,
-                        questions: {
-                            create: subject.questions.map((q) => ({
-                                ques_no: q.ques_no,
-                                ques: q.ques,
-                                option_1: q.option_1,
-                                option_2: q.option_2,
-                                option_3: q.option_3,
-                                option_4: q.option_4,
-                                correctAnswer: q.correctAnswer,
-                                explanation: q.explanation,
-                                add_favourite: q.add_favourite || false,
-                            })),
-                        },
-                    })),
-                },
+                name: 'Super Admin',
+                email: adminEmail,
+                password: hashedPassword,
+                role: client_1.AdminRole.SUPER_ADMIN,
             },
         });
-        console.log(`Created exam: ${createdExam.exam_name} (ID: ${createdExam.id})`);
+        console.log(`Created super admin with id: ${admin.id}`);
     }
     console.log(`Seeding finished.`);
 }
