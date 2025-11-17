@@ -1,13 +1,17 @@
 // apps/api/prisma/schema.prisma
+
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL") 
- shadowDatabaseUrl = "postgresql://postgres:sabit@localhost:5432/bcs_questions_shadow"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
   provider = "prisma-client-js"
 }
+
+// -----------------
+// CONTENT MODELS
+// -----------------
 
 model Exam {
   id        String    @id @default(cuid())
@@ -15,7 +19,7 @@ model Exam {
   subjects  Subject[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  date           DateTime?
+  date      DateTime?
   totalExaminees Int?
   highestMark    Float?
 
@@ -34,35 +38,64 @@ model Subject {
 }
 
 model Question {
-  id              String   @id @default(cuid())
-  ques_no         Int
-  ques            String   @db.Text
-  option_1        String
-  option_2        String
-  option_3        String
-  option_4        String
-  correctAnswer   String   // Stores the correct option text, e.g., "Option 1"
-  explanation     String   @db.Text
-  add_favourite   Boolean  @default(false)
-  
-  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
-  subjectId String
+  id            String   @id @default(cuid())
+  ques_no       Int
+  ques          String   @db.Text
+  option_1      String
+  option_2      String
+  option_3      String
+  option_4      String
+  correctAnswer String   // Stores the correct option text
+  explanation   String   @db.Text
+  add_favourite Boolean  @default(false)
+  subject       Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  subjectId     String
 
   @@map("questions")
 }
 
+// -----------------
+// AUTH MODELS
+// -----------------
+
+// Model for end-users (premium, paid, free)
 model User {
-  id        String  @id @default(cuid())
+  id        String   @id @default(cuid())
   name      String
-  email     String  @unique
-  phone     String? @unique
+  email     String   @unique
+  phone     String?  @unique
   password  String
-  userId    String  @unique @default(cuid()) // This is the "Wym1" field
-  
-  // Extra fields
-  role      String  @default("user") // 'user' or 'admin'
+  userId    String   @unique @default(cuid())
+  userType  UserType @default(FREE) // Use Enum for roles
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("users")
+}
+
+// Model for Admin Panel staff (super admin, admin, moderator)
+model Admin {
+  id        String    @id @default(cuid())
+  name      String
+  email     String    @unique
+  password  String
+  role      AdminRole @default(MODERATOR) // Use Enum for roles
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("admins")
+}
+
+// ENUMS
+
+enum UserType {
+  FREE
+  PAID
+  PREMIUM
+}
+
+enum AdminRole {
+  MODERATOR
+  ADMIN
+  SUPER_ADMIN
 }
