@@ -24,14 +24,14 @@ export declare class AuthController {
     };
     updateProfile(req: any, body: Prisma.UserUpdateInput): Promise<{
         user: {
-            id: string;
-            createdAt: Date;
-            updatedAt: Date;
             name: string;
+            id: string;
             email: string;
             phone: string | null;
             userId: string;
             role: string;
+            createdAt: Date;
+            updatedAt: Date;
         };
     }>;
 }

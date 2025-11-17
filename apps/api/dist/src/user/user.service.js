@@ -32,7 +32,7 @@ let UserService = class UserService {
     async createUser(data) {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(data.password, salt);
-        const uniqueId = "Wym" + Math.floor(100 + Math.random() * 900);
+        const uniqueId = "BbcQ" + Math.floor(100 + Math.random() * 900);
         return this.prisma.user.create({
             data: Object.assign(Object.assign({}, data), { password: hashedPassword, userId: uniqueId }),
         });
